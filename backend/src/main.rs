@@ -8,8 +8,10 @@ async fn main() {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
     println!("Servidor rodando em http://{}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    axum::serve(
+        tokio::net::TcpListener::bind(addr).await.unwrap(),
+        app.into_make_service()
+    )
+    .await
+    .unwrap();
 }

@@ -1,15 +1,15 @@
-use axum::{routing::get, Router};
+use axum::{routing::get, Router, Server};
 use std::net::SocketAddr;
-use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
+    let app = Router::new().route("/", get(|| async { "🚀 ZK Backend online!" }));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("Listening on {}", addr);
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
+    println!("Servidor rodando em http://{}", addr);
 
-    let listener = TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
-
