@@ -1,0 +1,11 @@
+# Ignorar arquivos desnecessários
+target/
+*.ptau
+*.sym
+Cargo.lock
+input_temp.json
+contracts/circuits/build/
+backend/target/
+frontend/.next/
+node_modules/
+
