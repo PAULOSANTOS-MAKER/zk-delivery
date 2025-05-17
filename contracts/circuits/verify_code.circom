@@ -1,21 +1,23 @@
-pragma circom 2.0.0;
+pragma circom 2.2.2;
 
-include "poseidon.circom";
-include "comparators.circom";
+include "../../circomlib/circuits/poseidon.circom";
+include "../../circomlib/circuits/comparators.circom";
 
-template VerifyCode() {
-    signal input code;
-    signal input hashCode;
-    signal output valid;
+template Main() {
+    signal input hash_code;
+    signal input locker_id;
+    signal input codigo_secreto;
+
+    signal output is_valid;
 
     component hasher = Poseidon(1);
-    hasher.inputs[0] <== code;
+    hasher.inputs[0] <== codigo_secreto;
 
-    component isEqual = IsEqual();
-    isEqual.in[0] <== hasher.out;
-    isEqual.in[1] <== hashCode;
+    component check = IsEqual();
+    check.in[0] <== hasher.out;
+    check.in[1] <== hash_code;
 
-    valid <== isEqual.out;
+    is_valid <== check.out;
 }
 
-component main = VerifyCode();
+component main = Main();

@@ -1,9 +1,9 @@
 pragma circom 2.0.0;
 
-include "../node_modules/circomlib/circuits/poseidon.circom";
+include "../../node_modules/circomlib/circuits/poseidon.circom";
 
 template ZKCode() {
-    signal private input code;
+    signal input code;
     signal input codeHash;
     signal output isValid;
 
@@ -13,4 +13,5 @@ template ZKCode() {
     isValid <== hasher.out === codeHash;
 }
 
-component main { public [codeHash, isValid] } = ZKCode();
+component main = ZKCode();
+
