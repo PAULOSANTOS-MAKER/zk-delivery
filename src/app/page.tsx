@@ -1,31 +1,42 @@
 "use client";
+import { useEffect } from "react";
 
-import React, { useState } from "react";
-import { ClienteForm } from "../components/ClienteForm";
-import { EntregadorForm } from "../components/EntregadorForm";
-import Login from "../components/Login";
+export default function TesteCarteira() {
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.ethereum) {
+      console.log("✅ Carteira detectada:", window.ethereum);
+    } else {
+      console.error("❌ Metamask não detectado no navegador");
+    }
+  }, []);
 
-export default function HomePage() {
-  const [usuario, setUsuario] = useState<string | null>(null);
+  const conectarCarteira = async () => {
+    if (!window.ethereum) {
+      alert("❌ Metamask não detectado!");
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      alert(`✅ Conectado: ${accounts[0]}`);
+    } catch (err) {
+      console.error("Erro ao conectar:", err);
+      alert("❌ Erro ao conectar carteira.");
+    }
+  };
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}>
-      <h1>ZK Delivery 🚚🔒</h1>
-
-      {!usuario ? (
-        <Login onLogin={(endereco) => setUsuario(endereco)} />
-      ) : (
-        <>
-          <p>Logado como: {usuario}</p>
-          <hr />
-          <h2>Cadastrar Pedido</h2>
-          <ClienteForm />
-
-          <hr />
-          <h2>Verificar Pedido</h2>
-          <EntregadorForm />
-        </>
-      )}
-    </main>
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">Teste de Carteira</h1>
+      <button
+        onClick={conectarCarteira}
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Conectar Carteira
+      </button>
+    </div>
   );
 }
+

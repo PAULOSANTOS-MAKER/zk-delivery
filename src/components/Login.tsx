@@ -22,7 +22,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID!,
           chainConfig: {
             chainNamespace: "eip155",
-            chainId: "0x1",
+            chainId: "0x1", // Ethereum Mainnet, use 0x5 para Goerli, etc.
             rpcTarget: "https://rpc.ankr.com/eth",
           },
           uiConfig: {
@@ -42,10 +42,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         await web3authInstance.initModal();
         setWeb3auth(web3authInstance);
       } catch (err) {
-        console.error("Erro ao inicializar Web3Auth:", err);
+        console.error("Erro ao iniciar Web3Auth:", err);
       }
     };
-
     init();
   }, []);
 
@@ -56,11 +55,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const provider = await web3auth.connect();
       const accounts = await (provider as any).request({ method: "eth_accounts" });
       const address = accounts[0];
-      console.log("Endereço:", address);
       onLogin(address);
     } catch (err) {
-      console.error("Erro ao fazer login:", err);
-      setError("❌ Falha ao conectar com a carteira.");
+      console.error("Erro ao fazer login com Web3Auth:", err);
+      setError("❌ Erro ao conectar via Web3Auth");
     }
   };
 
@@ -81,68 +79,82 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (res.ok) {
         onLogin(data.token);
       } else {
-        setError(data.message || "Erro na autenticação");
+        setError(data.message || "Erro na autenticação.");
       }
-    } catch (err) {
-      setError("Erro ao conectar com o servidor");
+    } catch {
+      setError("Erro ao conectar com o servidor.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>{isRegister ? "Cadastro de Entregador" : "Login"}</h2>
-      <form onSubmit={handleSubmit} className="login-form">
+    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+      <h2 className="text-xl font-bold mb-4">
+        {isRegister ? "Cadastro de Entregador" : "Login"}
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         {isRegister && (
-          <div className="form-group">
-            <label htmlFor="name">Nome:</label>
+          <div>
+            <label className="block text-sm">Nome:</label>
             <input
-              id="name"
-              name="name"
               type="text"
-              placeholder="Seu nome"
+              name="name"
+              required
+              className="w-full border rounded px-3 py-2"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
             />
           </div>
         )}
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
+        <div>
+          <label className="block text-sm">Email:</label>
           <input
-            id="email"
-            name="email"
             type="email"
-            placeholder="Seu email"
+            name="email"
+            required
+            className="w-full border rounded px-3 py-2"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Senha:</label>
+        <div>
+          <label className="block text-sm">Senha:</label>
           <input
-            id="password"
-            name="password"
             type="password"
-            placeholder="Sua senha"
+            name="password"
+            required
+            className="w-full border rounded px-3 py-2"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
           />
         </div>
-        <button type="submit" disabled={loading}>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
           {loading ? "Enviando..." : isRegister ? "Cadastrar" : "Entrar"}
         </button>
-        {error && <p className="error">{error}</p>}
+
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </form>
 
-      <hr />
-      <button onClick={handleWeb3AuthLogin}>
-        Entrar com Web3Auth (e-mail ou carteira)
+      <hr className="my-4" />
+
+      <button
+        onClick={handleWeb3AuthLogin}
+        className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+      >
+        Entrar com Web3Auth (email ou carteira)
       </button>
-      <button onClick={() => setIsRegister(!isRegister)}>
+
+      <button
+        onClick={() => setIsRegister(!isRegister)}
+        className="w-full text-blue-500 mt-3 underline"
+      >
         {isRegister ? "Já tem conta? Faça login" : "Não tem conta? Cadastre-se"}
       </button>
     </div>
